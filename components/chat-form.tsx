@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import * as React from 'react'
 import { useChatStore } from '@/services/store'
 import { useFetchTranslation } from '@/services/mutations'
+import { useCompletion } from 'ai/react'
 
 const languageButtons = [
   {
@@ -28,16 +29,31 @@ const languageButtons = [
 
 export function ChatForm() {
   const scrollAreaRef = React.useRef<HTMLDivElement | null>(null)
-  const [textToTranslate, setTextToTranslate] =
-    React.useState('hello how are you?')
   const { messages, language, setLanguage, addMessage } = useChatStore()
 
-  const translationsQuery = useFetchTranslation()
-
-  const handleSubmit = () => {
+  const {
+    completion,
+    setCompletion,
+    complete,
+    isLoading,
+    input: textToTranslate,
+    setInput: setTextToTranslate,
+    handleInputChange,
+  } = useCompletion({
+    api: '/api/translate',
+    initialInput: 'hello how are you?',
+  })
+  const handleSubmit = async () => {
     addMessage({ role: 'user', content: textToTranslate })
-    setTextToTranslate('')
-    translationsQuery.mutate({ textToTranslate, language })
+    const completion = await complete(textToTranslate, {
+      body: {
+        language,
+      },
+    })
+
+    if (completion) {
+      addMessage({ role: 'assistant', content: completion })
+    }
   }
 
   const handleLanguageChange = (language: string) => {
@@ -78,7 +94,9 @@ export function ChatForm() {
             )
           }
         })}
-        {translationsQuery.isPending && <AppMessage>Translating...</AppMessage>}
+        {isLoading && (
+          <AppMessage>{completion ? completion : 'Translating...'}</AppMessage>
+        )}
       </ScrollArea>
       <div className='flex flex-col space-y-4 px-2 py-4 border-t-2'>
         <div className='flex gap-4'>
@@ -100,9 +118,7 @@ export function ChatForm() {
             className='max-h-[3em] overflow-auto min-h-[1em]'
             placeholder='Type your message here...'
             value={textToTranslate}
-            onChange={(e) => {
-              setTextToTranslate(e.target.value)
-            }}
+            onChange={handleInputChange}
             onKeyDown={(e) => {
               if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                 handleSubmit()
