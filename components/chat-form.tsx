@@ -32,7 +32,7 @@ const languageButtons = [
 
 export function ChatForm() {
   const scrollAreaRef = React.useRef<HTMLDivElement | null>(null)
-  const { messages, language, setLanguage, addMessage } = useChatStore()
+  const { messages, language, setLanguage, addMessage, reset } = useChatStore()
 
   const {
     completion,
@@ -57,6 +57,8 @@ export function ChatForm() {
     if (completion) {
       addMessage({ role: 'assistant', content: completion })
     }
+
+    setTextToTranslate('')
   }
 
   const handleLanguageChange = (language: string) => {
@@ -116,9 +118,9 @@ export function ChatForm() {
             </Button>
           ))}
         </div>
-        <div className='flex gap-4 items-center'>
+        <div className='flex gap-4 items-stretch'>
           <Textarea
-            className='max-h-[3em] overflow-auto min-h-[1em]'
+            className='max-h-[6em] overflow-auto min-h-[1em]'
             placeholder='Type your message here...'
             value={textToTranslate}
             onChange={handleInputChange}
@@ -128,14 +130,26 @@ export function ChatForm() {
               }
             }}
           />
-          <Button
-            type='button'
-            onClick={() => {
-              handleSubmit()
-            }}
-          >
-            Send
-          </Button>
+          <div>
+            <Button
+              type='button'
+              onClick={() => {
+                handleSubmit()
+              }}
+              disabled={isLoading || !textToTranslate}
+              className='w-full'
+            >
+              Send
+            </Button>
+
+            <Button
+              variant={'link'}
+              onClick={() => reset()}
+              className='w-full mt-px'
+            >
+              Reset
+            </Button>
+          </div>
         </div>
       </div>
     </div>
