@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   const systemMessage: ChatCompletionSystemMessageParam = {
     role: 'system',
     content:
-      'You are a helpful translation assistant that translates text into the requested language. In your response only return the translated text. The text to translate and language to translate to will be provided within """.',
+      'You are a helpful translation assistant that translates text into the requested language. In your response only return the translated text. The text to translate and language to translate to will be provided within """. If the languge to translate is "english" then automatically detect what languge the original text is in and translate it to english.',
   }
 
   const userMessage: ChatCompletionUserMessageParam = {
@@ -38,6 +38,7 @@ export async function POST(req: Request) {
     model: 'gpt-4-1106-preview',
     stream: true,
     messages: [systemMessage, userMessage],
+    temperature: 0.8,
   })
 
   // Convert the response into a friendly text-stream

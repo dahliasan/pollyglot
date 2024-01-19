@@ -9,7 +9,6 @@ import { UserMessage, AppMessage } from './messages'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import * as React from 'react'
 import { useChatStore } from '@/services/store'
-import { useFetchTranslation } from '@/services/mutations'
 import { useCompletion } from 'ai/react'
 
 const languageButtons = [
@@ -24,6 +23,10 @@ const languageButtons = [
   {
     label: '🇯🇵 Japanese',
     value: 'japanese',
+  },
+  {
+    label: '❓ to English',
+    value: 'english',
   },
 ]
 
@@ -99,7 +102,7 @@ export function ChatForm() {
         )}
       </ScrollArea>
       <div className='flex flex-col space-y-4 px-2 py-4 border-t-2'>
-        <div className='flex gap-4'>
+        <div className='flex gap-2 flex-wrap'>
           {languageButtons.map((button) => (
             <Button
               key={button.value}
