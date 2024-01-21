@@ -8,8 +8,14 @@ import Hero from './hero'
 import { UserMessage, AppMessage } from './messages'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import * as React from 'react'
-import { useChatStore } from '@/services/store'
-import { useCompletion } from 'ai/react'
+import { useChat } from 'ai/react'
+import {
+  assistantMessage,
+  generateUserChatMessage,
+  initialChatMessages,
+} from '@/lib/prompts'
+import { ChatMessageProps } from '@/types/chat'
+import { Message } from 'ai'
 
 const languageButtons = [
   {
@@ -32,36 +38,65 @@ const languageButtons = [
 
 export function ChatForm() {
   const scrollAreaRef = React.useRef<HTMLDivElement | null>(null)
-  const { messages, language, setLanguage, addMessage, reset } = useChatStore()
+  const [language, setLanguage] = React.useState('french')
+  const [UIMessages, setUIMessages] = React.useState<ChatMessageProps[]>([
+    assistantMessage,
+  ])
+  const chatPairs = React.useRef(0)
 
   const {
-    completion,
-    complete,
+    messages,
+    append,
     isLoading,
-    input: textToTranslate,
-    setInput: setTextToTranslate,
+    input,
+    setInput,
     handleInputChange,
-  } = useCompletion({
-    api: '/api/translate',
+    data,
+    setMessages,
+  } = useChat({
+    api: '/api/chat',
     initialInput: 'hello how are you?',
+    initialMessages: initialChatMessages as Message[],
+    onFinish: (message) => {
+      setUIMessages((prev) => {
+        return [
+          ...prev,
+          {
+            ...message,
+            audioIndex: chatPairs.current,
+          },
+        ]
+      })
+      chatPairs.current++
+    },
   })
+
+  const audioData = data as { audio: string }[]
+
   const handleSubmit = async () => {
-    addMessage({ role: 'user', content: textToTranslate })
-    const completion = await complete(textToTranslate, {
-      body: {
-        language,
+    if (!input) return
+
+    const userMessage = generateUserChatMessage(input, language)
+    setUIMessages((prev) => [
+      ...prev,
+      {
+        role: 'user',
+        content: input,
       },
-    })
+    ])
+    setInput('')
 
-    if (completion) {
-      addMessage({ role: 'assistant', content: completion })
-    }
-
-    setTextToTranslate('')
+    await append(userMessage)
   }
 
   const handleLanguageChange = (language: string) => {
     setLanguage(language)
+  }
+
+  const reset = () => {
+    setMessages(initialChatMessages)
+    setUIMessages([assistantMessage])
+    setInput('hello how are you?')
   }
 
   React.useEffect(() => {
@@ -74,7 +109,7 @@ export function ChatForm() {
         viewport.scrollTop = viewport.scrollHeight
       }
     }
-  }, [messages, textToTranslate])
+  }, [messages])
 
   return (
     <div
@@ -83,7 +118,7 @@ export function ChatForm() {
     >
       <Hero />
       <ScrollArea ref={scrollAreaRef} className='min-h-[200px] h-[40vh] p-4'>
-        {messages.map((message, i) => {
+        {UIMessages.map((message, i) => {
           if (message.role === 'user') {
             return (
               <UserMessage key={i}>
@@ -94,12 +129,28 @@ export function ChatForm() {
             return (
               <AppMessage key={i}>
                 {typeof message.content === 'string' && message.content}
+                {audioData &&
+                  audioData.length > 0 &&
+                  message.audioIndex !== undefined && (
+                    <audio
+                      className='mt-4 h-[40px] '
+                      controls
+                      autoPlay
+                      src={`data:audio/mp3;base64,${
+                        audioData[message.audioIndex].audio
+                      }`}
+                    />
+                  )}
               </AppMessage>
             )
           }
         })}
         {isLoading && (
-          <AppMessage>{completion ? completion : 'Translating...'}</AppMessage>
+          <AppMessage>
+            {messages[messages.length - 1].role === 'assistant'
+              ? messages[messages.length - 1].content + ' \n\n...'
+              : 'Thinking...'}
+          </AppMessage>
         )}
       </ScrollArea>
       <div className='flex flex-col space-y-4 px-2 py-4 border-t-2'>
@@ -121,7 +172,7 @@ export function ChatForm() {
           <Textarea
             className='max-h-[6em] overflow-auto min-h-[1em]'
             placeholder='Type your message here...'
-            value={textToTranslate}
+            value={input}
             onChange={handleInputChange}
             onKeyDown={(e) => {
               if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -135,7 +186,7 @@ export function ChatForm() {
               onClick={() => {
                 handleSubmit()
               }}
-              disabled={isLoading || !textToTranslate}
+              disabled={isLoading || !input}
               className='w-full'
             >
               Send
