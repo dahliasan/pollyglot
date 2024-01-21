@@ -8,7 +8,7 @@ export const AppMessage = ({ children, className, ...props }: MessageProps) => {
       className={cn('flex items-end justify-start mb-4', className)}
       {...props}
     >
-      <div className='flex flex-col space-y-1 text-base max-w-sm mx-2 order-2 items-start'>
+      <div className='flex flex-col space-y-1 text-sm sm:text-base max-w-sm mx-2 order-2 items-start'>
         <div>
           <span className='px-4 py-2 rounded-lg inline-block rounded-bl-none bg-sky-950 text-white'>
             {children}
@@ -30,7 +30,7 @@ export const UserMessage = ({
       className={cn('flex items-end justify-end mb-4', className)}
       {...props}
     >
-      <div className='flex flex-col space-y-1 text-base max-w-sm mx-2 order-1 items-end'>
+      <div className='flex flex-col space-y-1 text-sm sm:text-base max-w-sm mx-2 order-1 items-end'>
         <div>
           <span className='px-4 py-2 rounded-lg inline-block rounded-br-none bg-sky-200 text-black'>
             {children}

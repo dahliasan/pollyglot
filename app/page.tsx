@@ -5,7 +5,7 @@ import { ReactQueryProvider } from './react-query-provider'
 export default function Home() {
   return (
     <ReactQueryProvider>
-      <main className='flex min-h-screen flex-col items-center justify-between py-6 px-4'>
+      <main className='flex h-screen sm:h-auto flex-col items-center justify-between sm:py-6 sm:px-4'>
         <ChatForm />
       </main>
     </ReactQueryProvider>

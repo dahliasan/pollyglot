@@ -120,7 +120,7 @@ export function ChatForm() {
       <Hero />
       <ScrollArea
         ref={scrollAreaRef}
-        className='min-h-[200px] h-[50vh] px-4 py-2'
+        className='min-h-[200px] h-[50vh] px-4 py-2 flex-grow'
       >
         {UIMessages.map((message, i) => {
           if (message.role === 'user') {
