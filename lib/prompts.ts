@@ -7,7 +7,7 @@ const systemMessage: CreateMessage = {
 
 export const assistantMessage: CreateMessage = {
   role: 'assistant',
-  content: `Hi I'm pollyglot! I can help you translate and learn a new language. What language would you like to learn?`,
+  content: `👋 Hi I'm pollyglot! I can help you translate and learn a new language. Let's start chatting in a language you would like to learn!`,
 }
 
 export const initialChatMessages = [
