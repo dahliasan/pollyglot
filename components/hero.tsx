@@ -11,7 +11,7 @@ const Hero = () => {
         <Image src='/parrot.png' alt='parrot' width={100} height={100} />
         <div className='text-white'>
           <h1 className='text-green-500 text-4xl font-extrabold'>PollyGlot</h1>
-          <p>Perfect translation every time</p>
+          <p>Translate and learn a language</p>
         </div>
       </div>
     </div>
