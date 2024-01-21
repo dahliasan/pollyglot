@@ -11,6 +11,10 @@ export const runtime = 'edge'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
+  baseURL: 'https://oai.hconeai.com/v1',
+  defaultHeaders: {
+    'Helicone-Auth': process.env.HELICONE_AUTH!,
+  },
 })
 
 export async function POST(req: Request) {
@@ -22,7 +26,7 @@ export async function POST(req: Request) {
 
   // Request the OpenAI API for the response based on the prompt
   const response = await openai.chat.completions.create({
-    model: 'gpt-4-1106-preview',
+    model: 'gpt-3.5-turbo-1106',
     stream: true,
     messages: messages,
     temperature: 0.8,
