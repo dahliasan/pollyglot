@@ -36,7 +36,6 @@ export function ChatForm() {
 
   const {
     completion,
-    setCompletion,
     complete,
     isLoading,
     input: textToTranslate,
