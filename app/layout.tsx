@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Maven_Pro } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const mavenpro = Maven_Pro({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Pollyglot',
@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en'>
-      <body className={inter.className}>{children}</body>
+      <body className={mavenpro.className}>{children}</body>
     </html>
   )
 }
